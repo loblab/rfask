@@ -2,9 +2,10 @@
 
 315/433MHz ASK/OOK transmitting/receving with cheap (RMB 5) transmitter/receiver modules, no HackRF needed.
 
+- Features: supports PWM, Biphase(Manchester) code; dump/load
 - Platform: Linux (Raspberry Pi)
-- Ver: 0.3
-- Updated: 9/17/2017
+- Ver: 0.4
+- Updated: 9/23/2017
 - Created: 8/7/2017
 - Author: loblab
 
@@ -33,6 +34,7 @@ Connect transmitter/receiver to Pi's GND/VCC/GPIO, and modify ask_config.py
 
 ## History
 
+- 0.4 (9/23/2017): Supports biphase(Manchester) decoding/encoding; Auto detect signal type; test scripts support multiple cases
 - 0.3 (8/31/2017): Receiver supports signal without start high/low level, any gap can devide signals; added monitor & action
 - 0.2 (8/11/2017): OOP; based on timestamp instead of sample count; don't use callback
 - 0.1 (8/7/2017) : Initial version, support decode/encode, transmitter/receiver

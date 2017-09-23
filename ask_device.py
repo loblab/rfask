@@ -14,6 +14,7 @@
 
 import RPi.GPIO as GPIO 
 import time 
+from ask_wave import *
 
 class Transmitter:
 
@@ -27,8 +28,9 @@ class Transmitter:
     def unlock(self):
         GPIO.output(self.pin_tx, 0)
 
-    def send(self, ts):
-        b = 1
+    def send(self, wave):
+        b = wave.startbit
+        ts = wave.timestamp
         t1 = time.time()
         GPIO.output(self.pin_tx, b)
         t1 -= ts[0]
@@ -45,7 +47,7 @@ class Transmitter:
 
 class Receiver:
 
-    def __init__(self, pin_rx, pin_en, sample_period=0.1, min_gap=3, max_gap=10):
+    def __init__(self, pin_rx, pin_en, sample_period=0.05, min_gap=3, max_gap=10):
         GPIO.setup(pin_en, GPIO.OUT) 
         # Don't enable GPIO.PUD_DOWN nor GPIO.PUD_UP due to the small receiver current
         GPIO.setup(pin_rx, GPIO.IN)
@@ -66,12 +68,14 @@ class Receiver:
         now = time.time()
         return (b, now)
 
-    def receive(self, ts):
+    def receive(self):
+        wave = BitWave()
+        ts = wave.timestamp
         b = GPIO.input(self.pin_rx)
         now = time.time()
         ch = GPIO.wait_for_edge(self.pin_rx, GPIO.BOTH, timeout=self.min_gap)
         if ch is not None:
-            return False 
+            return None 
         b0 = b
         t0 = now
         ts.append(t0)
@@ -79,11 +83,10 @@ class Receiver:
         b = GPIO.input(self.pin_rx)
         now = time.time()
         if ch is None:
-            return False
+            return None
         if b == b0:
-            return False
-        if b == 1:
-            ts.append(t0)
+            return None
+        wave.startbit = b0
         self.bit = b
         self.sample_time = now
         self.edge_time = now
@@ -95,10 +98,10 @@ class Receiver:
                 if now - self.edge_time > min_gap:
                     if b == 0:
                         ts.append(now)
-                    return True
+                    return wave
             else:
                 ts.append(now)
                 self.edge_time = now
                 self.bit = b
-        return True
+        return wave
 

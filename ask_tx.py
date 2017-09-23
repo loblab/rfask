@@ -16,9 +16,10 @@
 import RPi.GPIO as GPIO 
 import time 
 import sys
+import os.path
 from bitstring import *
 from ask_config import *
-from ask_struct import *
+from ask_signal import *
 from ask_device import *
 
 def list_command():
@@ -26,17 +27,31 @@ def list_command():
         print key,
     print
 
-
-def play_command(tx, cmd):
+def play_command(tx, cmd, repeat=3):
     cmdcfg = ASK_DATA[cmd]
-    repeat = cmdcfg[0]
-    sig = Signal(BitArray(cmdcfg[6]), cmdcfg[4], cmdcfg[5]*1e-3, cmdcfg[1]*1e-3, cmdcfg[2]*1e-3, cmdcfg[3]*1e-3)
-    ts = []
-    sig.encode(ts)
-    BitWave(ts).show()
-    for i in range(0, repeat):
+    sig = SignalAuto(cmdcfg)
+    wave = sig.encode()
+    sig.show()
+    wave.show()
+    for i in range(repeat):
         print i + 1
-        tx.send(ts)
+        tx.send(wave)
+    return True
+
+def play_file(tx, index, repeat=3):
+    filename = DATA_FILE % index
+    if not os.path.isfile(filename):
+        return False
+    sig = SignalAuto()
+    with open (filename, 'rb') as fp:
+        sig.load(fp)
+    wave = sig.encode()
+    sig.show()
+    wave.show()
+    for i in range(repeat):
+        print i + 1
+        tx.send(wave)
+    return True
 
 def main(argv=None):
     if argv is None:
@@ -57,6 +72,8 @@ def main(argv=None):
         tx.lock()
     elif cmd == 'unlock':
         tx.unlock()
+    elif cmd.isdigit():
+        play_file(tx, int(cmd))
     else:
         play_command(tx, cmd)
 

@@ -18,7 +18,7 @@ import time
 import sys
 import os
 from bitstring import *
-from ask_struct import *
+from ask_signal import *
 from ask_device import *
 from ask_config import *
 
@@ -34,27 +34,27 @@ def log_msg(msg):
 def load_buttons():
     for key in ASK_DATA:
         cfg = ASK_DATA[key]
-        Buttons[key] = BitArray(cfg[6])
+        Buttons[key] = SignalAuto(cfg)
 
-def get_button(bits):
+def get_button(signal):
     for key in Buttons:
-        if bits == Buttons[key]:
+        if signal == Buttons[key]:
             return key
     return 'Unknown'
 
 def ask_action(signal):
-    key = get_button(signal.bits)
+    key = get_button(signal)
     log_msg("%-10s - %s" % (key, str(signal)))
     if key == 'pc-wol':
         os.system("pcon")
 
 def receive_loop(rx, timeout):
     start_time = time.time()
-    sig = Signal()
+    sig = SignalAuto()
     while time.time() - start_time < timeout: 
-        ts = []
-        if rx.receive(ts):
-            if sig.decodePWM(ts):
+        wave = rx.receive()
+        if wave:
+            if sig.decode(wave):
                 #sig.show()
                 ask_action(sig)
     return True

@@ -18,67 +18,227 @@
 import time 
 import sys
 import random
+import os.path
 from bitstring import *
-from ask_struct import *
+from ask_signal import *
 from ask_config import *
 
-def testDecode1():
-    ts = [1502507445.157925, 1502507445.162985, 1502507445.164383, 1502507445.165382, 1502507445.16588, 1502507445.16638, 1502507445.168378, 1502507445.169378, 1502507445.170377, 1502507445.170876, 1502507445.171376, 1502507445.171875, 1502507445.172374, 1502507445.173473, 1502507445.173973, 1502507445.174971, 1502507445.176469, 1502507445.177468, 1502507445.177968, 1502507445.178968, 1502507445.180429, 1502507445.181464, 1502507445.181964, 1502507445.183987, 1502507445.189056]
-    sig = Signal()
-    sig.decode(ts)
+DITHER = 0.0
 
-def testDecode2():
-    ts = [1502509047.836174, 1502509047.840846, 1502509047.841847, 1502509047.842045, 1502509047.842874, 1502509047.843544, 1502509047.843844, 1502509047.844542, 1502509047.844843, 1502509047.845041, 1502509047.845842, 1502509047.84654, 1502509047.84684, 1502509047.847039, 1502509047.847839, 1502509047.848038, 1502509047.848838, 1502509047.849037, 1502509047.849837, 1502509047.850037, 1502509047.850835, 1502509047.851554, 1502509047.851836, 1502509047.852534, 1502509047.852833, 1502509047.853032, 1502509047.854005, 1502509047.854033, 1502509047.854833, 1502509047.855552, 1502509047.855831, 1502509047.85603, 1502509047.856829, 1502509047.857529, 1502509047.857828, 1502509047.858029, 1502509047.858827, 1502509047.859527, 1502509047.859826, 1502509047.860526, 1502509047.860825, 1502509047.861026, 1502509047.861825, 1502509047.862523, 1502509047.862823, 1502509047.863524, 1502509047.863822, 1502509047.864021, 1502509047.864821, 1502509047.865022, 1502509047.86582, 1502509047.866021, 1502509047.866819, 1502509047.867535, 1502509047.867817, 1502509047.868518, 1502509047.868817, 1502509047.869017, 1502509047.869815, 1502509047.870516, 1502509047.870919, 1502509047.871514, 1502509047.871815, 1502509047.872014, 1502509047.872813, 1502509047.873013, 1502509047.873813, 1502509047.874012, 1502509047.874811, 1502509047.875512, 1502509047.875824, 1502509047.87651, 1502509047.87681, 1502509047.87701, 1502509047.877807, 1502509047.878508, 1502509047.878808, 1502509047.879507, 1502509047.879817, 1502509047.880506, 1502509047.880817, 1502509047.881506, 1502509047.8866] 
-    sig = Signal()
-    sig.decode(ts)
+def setDither20():
+    global DITHER
+    DITHER = 0.2
+    return True
 
-def testDecode3():
-    ts = [1502509608.616054, 1502509608.621112, 1502509608.622111, 1502509608.622411, 1502509608.62311, 1502509608.623909, 1502509608.624109, 1502509608.624909, 1502509608.625108, 1502509608.625408, 1502509608.626107, 1502509608.626906, 1502509608.627107, 1502509608.627406, 1502509608.628105, 1502509608.628405, 1502509608.629104, 1502509608.629405, 1502509608.630103, 1502509608.630403, 1502509608.631102, 1502509608.631901, 1502509608.632101, 1502509608.6329, 1502509608.6331, 1502509608.6334, 1502509608.634099, 1502509608.634399, 1502509608.635098, 1502509608.635897, 1502509608.636097, 1502509608.636396, 1502509608.637096, 1502509608.637895, 1502509608.638095, 1502509608.638395, 1502509608.639094, 1502509608.639893, 1502509608.640099, 1502509608.640893, 1502509608.641092, 1502509608.641392, 1502509608.642092, 1502509608.64289, 1502509608.643091, 1502509608.643889, 1502509608.644089, 1502509608.644389, 1502509608.645088, 1502509608.645387, 1502509608.646087, 1502509608.646386, 1502509608.647086, 1502509608.647885, 1502509608.648085, 1502509608.648884, 1502509608.649085, 1502509608.649384, 1502509608.650132, 1502509608.650883, 1502509608.651084, 1502509608.651882, 1502509608.652082, 1502509608.652381, 1502509608.653082, 1502509608.65338, 1502509608.65408, 1502509608.65438, 1502509608.65508, 1502509608.655878, 1502509608.656077, 1502509608.656877, 1502509608.657077, 1502509608.657377, 1502509608.658075, 1502509608.658875, 1502509608.659075, 1502509608.659874, 1502509608.660099, 1502509608.660937, 1502509608.661073, 1502509608.661873, 1502509608.666966]
-    sig = Signal()
-    sig.decode(ts)
+def setDither40():
+    global DITHER
+    DITHER = 0.4
+    return True
 
-def testEncode(duty=1):
-    sig = Signal(BitArray('0x123456'), duty)
-    sig.show()
-    ts = []
-    t1 = time.time()
-    sig.encode(ts)
-    t2 = time.time()
-    wave = BitWave(ts)
-    wave.rand(sig.period * 0.2)
+def setDither60():
+    global DITHER
+    DITHER = 0.6
+    return True
+
+def testBitWave():
+    wave = BitWave()
+    wave.random()
     wave.show()
+    return True
+
+def testCodec(sig1, sig2, dither=0.0):
+    global DITHER
+    size = random.randint(1, 32)
+    val = random.randint(1, 2**size)
+    sig1.bits = BitArray('0x%x' % val)
+    sig1.show()
+    t1 = time.time()
+    wave = sig1.encode()
+    t2 = time.time()
     print "Encode time: %.2fms" % ((t2 - t1) * 1000)
-    if (duty < 1):
-        sig2 = Signal()
-        t1 = time.time()
-        if sig2.decodePWM(wave.timestamp):
-            t2 = time.time()
-            print "Decode time: %.2fms" % ((t2 - t1) * 1000)
-            sig2.show()
+    wave.dither(sig1.period * DITHER)
+    wave.show()
+    t1 = time.time()
+    if sig2.decode(wave):
+        t2 = time.time()
+        print "Decode time: %.2fms" % ((t2 - t1) * 1000)
+        sig2.show()
+        return sig2 == sig1
+    return False
 
-def test1():
-    testEncode(1)
-    testEncode(0.75)
+def testCodecRaw():
+    sig1 = SignalRaw()
+    sig2 = SignalRaw()
+    return testCodec(sig1, sig2)
 
-def test2():
-    testDecode1()
-    testDecode2()
-    testDecode3()
+def testCodecPWM75():
+    sig1 = SignalPWM(0.75)
+    sig2 = SignalPWM()
+    return testCodec(sig1, sig2)
 
-def convert(bstr):
-    bits = BitArray(bstr)
-    print len(bits), bits
+def testCodecPWM75Low():
+    sig1 = SignalPWM(0.75, start1=0, start0=5e-3)
+    sig2 = SignalPWM()
+    return testCodec(sig1, sig2)
 
-def convert_all():
+def testCodecBP():
+    sig1 = SignalBP(39)
+    sig2 = SignalBP()
+    return testCodec(sig1, sig2)
+
+def testAutoDecode():
+    sig1 = SignalPWM(0.75)
+    sig2 = SignalAuto()
+    b1 = testCodec(sig1, sig2)
+    sig1 = SignalBP(39)
+    b2 = testCodec(sig1, sig2)
+    return b1 and b2
+
+def testAutoInit():
     for key in ASK_DATA:
         cfg = ASK_DATA[key]
-        print key,
-        convert(cfg[6])
+        sig = SignalAuto(cfg)
+        print key, 
+        sig.show()
+        wave = sig.encode()
+        sig2 = SignalAuto()
+        if not sig2.decode(wave):
+            print "testAutoInit: failed to decode"
+            return False
+        sig2.show()
+        if sig2 != sig:
+            print "testAutoInit: error in compare"
+            return False
+    return True
+
+def testDump(filename, obj):
+    obj.show()
+    t1 = time.time()
+    with open (filename, 'wb') as fp:
+        obj.dump(fp)
+    t2 = time.time()
+    print "Dump time: %.2fms" % ((t2 - t1) * 1000)
+
+def testLoad(filename, obj):
+    t1 = time.time()
+    with open (filename, 'rb') as fp:
+      obj.load(fp)
+    t2 = time.time()
+    print "Load time: %.2fms" % ((t2 - t1) * 1000)
+    obj.show()
+
+def testStoreWave():
+    tmpfile='/tmp/wave.dat'
+    wave1 = BitWave()
+    wave1.random()
+    wave2 = BitWave()
+    testDump(tmpfile, wave1)
+    testLoad(tmpfile, wave2)
+    return wave1 == wave2
+
+def testStoreSignal(sig1, sig2):
+    tmpfile='/tmp/signal.dat'
+    size = random.randint(1, 32)
+    val = random.randint(1, 2**size)
+    sig1.bits = BitArray('0x%x' % val)
+    testDump(tmpfile, sig1)
+    testLoad(tmpfile, sig2)
+    return sig1 == sig2
+
+def testStoreRaw():
+    sig1 = SignalRaw()
+    sig2 = SignalRaw()
+    return testStoreSignal(sig1, sig2)
+
+def testStorePWM():
+    sig1 = SignalPWM(0.75)
+    sig2 = SignalPWM()
+    return testStoreSignal(sig1, sig2)
+
+def testStoreBP():
+    sig1 = SignalBP(39)
+    sig2 = SignalBP()
+    return testStoreSignal(sig1, sig2)
+
+def testLoadFiles():
+    i = 0
+    while True:
+        i += 1
+        filename = DATA_FILE % i
+        if not os.path.isfile(filename):
+            break
+        #print i
+        #print filename
+        sig = SignalAuto()
+        with open (filename, 'rb') as fp:
+            sig.load(fp)
+        print "%3d:" % i,
+        sig.show()
+    return True
+
+TEST_CASES = [
+    [testBitWave, "testBitWave"],
+    [testCodecRaw, "testCodecRaw"],
+    [testCodecPWM75, "testCodecPWM 75%"],
+    [testCodecPWM75Low, "testCodecPWM 75%, Low level start"],
+    [testCodecBP, "testCodecBP(Biphase)"],
+    [testAutoDecode, "testAutoDecode"],
+    [testAutoInit, "testAutoInit"],
+    [testStoreWave, "testStoreWave"],
+    [testStoreRaw, "testStoreRaw"],
+    [testStorePWM, "testStorePWM"],
+    [testStoreBP, "testStoreBP"],
+    [testLoadFiles, "testLoadFiles"],
+    [setDither20, "setDither 20%"],
+    [setDither40, "setDither 40%"],
+    [setDither40, "setDither 60%"],
+]
+
+def list_cases():
+    for i in range(len(TEST_CASES)):
+        print "%2d: %s" % (i + 1, TEST_CASES[i][1])
+
+def run_case(index):
+    case = TEST_CASES[index - 1]
+    print
+    print "Case %d: %s" % (index, case[1])
+    print '========================================='
+    t1 = time.time()
+    rc = case[0]()
+    t2 = time.time()
+    print '----------------------'
+    print "%s. %.2f ms" % ('PASS' if rc else 'FAIL', (t2 - t1) * 1000)
+    return rc
+     
+def run_cases(cases):
+    passed = 0
+    failed = 0
+    t1 = time.time()
+    for case in cases:
+        rc = run_case(int(case))
+        if rc:
+            passed += 1
+        else:
+            failed += 1
+    t2 = time.time()
+    total = passed + failed
+    if total > 1:
+        print
+        print '#########################################'
+        print "%d/%d FAIL. %.2f ms" % (failed, total, (t2 - t1) * 1000)
+
 
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    convert_all()
+    if len(argv) < 2:
+        list_cases()
+        return 1
+    if argv[1] == 'all':
+        cases = range(1, len(TEST_CASES) + 1)
+    else:
+        cases = argv[1:]
+    run_cases(cases)
 
 if __name__ == "__main__":
     sys.exit(main())

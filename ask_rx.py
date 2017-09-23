@@ -17,23 +17,27 @@ import RPi.GPIO as GPIO
 import time 
 import sys
 from bitstring import *
-from ask_struct import *
+from ask_signal import *
 from ask_device import *
-from ask_config import PIN_ASK_EN, PIN_ASK_RX
+from ask_config import PIN_ASK_EN, PIN_ASK_RX, DATA_FILE
 
 def receive_loop(rx, timeout):
     start_time = time.time()
     total = 0
-    sig = Signal()
+    sig = SignalAuto()
     while ((time.time() - start_time < timeout) and (total < 500)): 
-        ts = []
-        if rx.receive(ts):
-            if sig.decodePWM(ts):
-                #bw = BitWave(ts)
-                #bw.showRaw()
-                #bw.show()
-                sig.show()
+        wave = rx.receive()
+        if wave:
+            #wave.show()
+            if sig.decode(wave):
                 total += 1
+                filename = DATA_FILE % total
+                with open(filename, 'wb') as fp:
+                    sig.dump(fp)
+                    #wave.dump(fp)
+                #wave.showRaw()
+                #wave.show()
+                sig.show()
     return total
 
 def main(argv=None):
