@@ -16,42 +16,67 @@
 import RPi.GPIO as GPIO 
 import time 
 import sys
+import os.path
+import argparse
 from bitstring import *
 from ask_signal import *
 from ask_device import *
-from ask_config import PIN_ASK_EN, PIN_ASK_RX, DATA_FILE
+from ask_config import VERSION, PIN_ASK_EN, PIN_ASK_RX, DATA_FILE
 
-def receive_loop(rx, timeout):
-    start_time = time.time()
+def next_file_index():
+    i = 0
+    while True:
+        i += 1
+        filename = DATA_FILE % i
+        if not os.path.isfile(filename):
+            return i
+    return 0
+
+def receive_loop(rx, timeout, save=False, debug=0):
     total = 0
+    findex = next_file_index()
+    print "Receive signals for %d seconds..." % timeout
+    start_time = time.time()
     sig = SignalAuto()
-    while ((time.time() - start_time < timeout) and (total < 500)): 
+    while (time.time() - start_time < timeout): 
         wave = rx.receive()
         if wave:
-            #wave.show()
+            if debug == 2:
+                wave.show()
             if sig.decode(wave):
                 total += 1
-                filename = DATA_FILE % total
-                with open(filename, 'wb') as fp:
-                    sig.dump(fp)
-                    #wave.dump(fp)
-                #wave.showRaw()
-                #wave.show()
+                print time.strftime('%H:%M:%S -', time.localtime(time.time())),
+                if save:
+                    filename = DATA_FILE % findex
+                    print "FILE %d: " % findex,
+                    with open(filename, 'wb') as fp:
+                        sig.dump(fp)
+                        #wave.dump(fp)
+                    findex += 1
                 sig.show()
+                if debug == 1:
+                    wave.show()
     return total
 
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv
-    timeout = 5
-    if len(argv) > 1:
-        timeout = float(argv[1])
+def main():
+    parser = argparse.ArgumentParser(version=VERSION,
+        description="Receive & decode ASK/OOK signals, save to files") 
+
+    parser.add_argument('-t', dest='timeout', type=int, default=30, 
+        help="run TIMEOUT seconds then quit the program. default 30")
+    parser.add_argument('-s', dest='save', action='store_true', 
+        help="save received signals to files (DATA_FILE in ask_config.py)")
+    parser.add_argument('-d', dest='debug', type=int, default=0, choices=range(3), 
+        help="debug info level, greater for more. default 0")
+
+    args = parser.parse_args()
 
     GPIO.setmode(GPIO.BCM) 
     rx = Receiver(PIN_ASK_RX, PIN_ASK_EN)
-    total = receive_loop(rx, timeout)
+    total = receive_loop(rx, args.timeout, args.save, args.debug)
     GPIO.cleanup()
     print "%d received." % total
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())

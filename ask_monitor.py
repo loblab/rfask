@@ -64,7 +64,7 @@ def main(argv=None):
         argv = sys.argv
     timeout = 5
     if len(argv) > 1:
-        timeout = float(argv[1])
+        timeout = int(argv[1])
 
     load_buttons()
     GPIO.setmode(GPIO.BCM) 

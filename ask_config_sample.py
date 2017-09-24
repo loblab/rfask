@@ -16,6 +16,8 @@
 # Copy this file to ask_config.py, add your own config data,
 # Don't commit your config data since it is security!
 
+VERSION = "Ver 0.5, 9/24/2017, loblab"
+
 PIN_ASK_TX = 14 
 PIN_ASK_EN = 15
 PIN_ASK_RX = 18
