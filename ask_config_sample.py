@@ -30,12 +30,12 @@ DATA_FILE = "/home/loblab/data/%06d.dat"
 ASK_CMD = {
 #       name: 'PWM', start-high, start-low, stop-low, duty, period, bits
 #       name: 'BPS', , stop-low, leading, period, bits
-     'hello': ['PWM', 5.0, 0.5, 1.0, 0.75, 1.0, '0x68656c6c6f0'],
-     'world': ['BPS', 5.0, 3.0, 31, 0.5, '0x68656c6c6f0'],
-     'test1': ['PWM', 5.0, 1.0, 8.0, 0.75, 1.0, '0x68656c6c6f'],
-     'test2': ['PWM', 5.0, 1.0, 8.0, 0.75, 1.0, '0x68656c6c6f, 0b1'],
-     'test3': ['PWM', 5.0, 1.0, 8.0, 0.75, 1.0, '0x68656c6c6f, 0b01'],
-     'test4': ['BPS', 5.0, 1.0, 39, 1.0, '0x68656c6c6f'],
+     'hello': ['PWM', 5.0, 0.5, 1.0, 0.75, 1.0, '0x68656c6c6f'],
+     'world': ['BPS', 5.0, 3.0, 31, 0.5, '0x776f726c64'],
+     'test1': ['PWM', 5.0, 1.0, 8.0, 0.75, 1.0, '0x68656c6c6f, 0b1'],
+     'test2': ['PWM', 5.0, 1.0, 8.0, 0.75, 1.0, '0x68656c6c6f, 0b01'],
+     'test3': ['BPS', 5.0, 1.0, 39, 1.0, '0x68656c6c6f'],
+    'pc-wol': ['PWM', 0.0, 9.6, 2.0, 0.75, 1.290, '0b10010110101001101001001010'],
 }
 
 ASK_ACTION = {

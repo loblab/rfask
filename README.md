@@ -25,6 +25,8 @@ Run programs with '-h' option to see details.
 
 - test.py: self test cases. run without device. 
 
+![ASK/OOK send and receive](https://raw.githubusercontent.com/loblab/rfask/master/screenshot.png)
+
 ## Setup
 
 ```bash
