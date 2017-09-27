@@ -34,7 +34,7 @@ class BitWave:
     def show(self):
         size = len(self.timestamp) - 1
         dur = self.timestamp[-1] - self.timestamp[0]
-        print '%.1fms/%d/%d:' % (dur * 1000, self.startbit, size),
+        print '[WAV] %.1fms/%d/%d:' % (dur * 1000, self.startbit, size),
         for i in range(0, size):
           print '%.2f' % ((self.timestamp[i + 1] - self.timestamp[i]) * 1000),
         print

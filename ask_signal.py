@@ -17,7 +17,7 @@ import pickle
 from bitstring import *
 from ask_wave import *
 
-class Signal:
+class SignalBase:
 
     def show(self):
         print self.__str__()
@@ -32,7 +32,7 @@ class Signal:
             return self.bits != other.bits
         return True
 
-class SignalRaw(Signal):
+class SignalRaw(SignalBase):
 
     def __init__(self, period=1e-3):
         self.period = period
@@ -80,7 +80,7 @@ class SignalRaw(Signal):
             bs = '0b1' if b else '0b0'
         return True
 
-class SignalPWM(Signal):
+class SignalPWM(SignalBase):
 
     def __init__(self, duty=0.75, period=1e-3, start1=5e-3, start0=1e-3, stop0=1e-2):
         self.duty = duty
@@ -135,7 +135,7 @@ class SignalPWM(Signal):
     def decode(self, wave):
         ts = wave.timestamp
         size = len(ts) - 1
-        if size < 9:  # 4 bits at least
+        if size < 17:  # 8 bits at least
             return False
         if wave.startbit == 1:
             self.start1 = ts[1] - ts[0]
@@ -166,7 +166,7 @@ class SignalPWM(Signal):
         if (c1 == 0):
             return False
         self.duty = sum1 / c1 / self.period
-        if self.duty > 0.95:
+        if self.duty > 0.9:
             return False
 
         for i in range(i1, size - 1, 2):
@@ -176,7 +176,7 @@ class SignalPWM(Signal):
         return True
 
 
-class SignalBP(Signal):
+class SignalBP(SignalBase):
 
     def __init__(self, leading=20, period=1e-3, start0=5e-3, stop0=3e-3):
         self.start0 = start0
@@ -234,9 +234,9 @@ class SignalBP(Signal):
         ts.append(t)
         return wave
 
-    def detectHead(self, ts):
+    def detect_head(self, ts):
         if len(ts) < 20:
-            #print "SignalBP.detectHead: too short %d" % len(ts)
+            #print "SignalBP.detect_head: too short %d" % len(ts)
             return 0
         self.start0 = ts[1] - ts[0]
         count = 0
@@ -250,7 +250,7 @@ class SignalBP(Signal):
             if wmin > w:
                 wmin = w
                 if wmin < 1e-4:
-                    #print "SignalBP.detectHead: too small wmin %f" % wmin
+                    #print "SignalBP.detect_head: too small wmin %f" % wmin
                     return 0
             if wmax < w:
                 if count > 8:
@@ -265,18 +265,18 @@ class SignalBP(Signal):
                             self.period = wavg
                             return i + 1
                         else:
-                            #print "SignalBP.detectHead: invalid width %d (%.2f at %d), (should be 2)" % (wn, w * 1e3, i)
+                            #print "SignalBP.detect_head: invalid width %d (%.2f at %d), (should be 2)" % (wn, w * 1e3, i)
                             return 0
                 wmax = w
             count += 1
             wsum += w
             b = 1 - b
-        #print "SignalBP.detectHead: didn't find head"
+        #print "SignalBP.detect_head: didn't find head"
         return 0
 
     def decode(self, wave):
         ts = wave.timestamp if wave.startbit == 0 else wave.timestamp[1:]
-        start = self.detectHead(ts)
+        start = self.detect_head(ts)
         if start <= 0:
             #print "SignalBP.decode: cannot find head"
             return False
@@ -312,7 +312,7 @@ class SignalBP(Signal):
         return True
 
 
-class SignalAuto(Signal):
+class Signal(SignalBase):
 
     def __init__(self, params=None):
         if params is None:

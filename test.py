@@ -48,8 +48,8 @@ def testBitWave():
 
 def testCodec(sig1, sig2, dither=0.0):
     global DITHER
-    size = random.randint(1, 32)
-    val = random.randint(1, 2**size)
+    size = random.randint(5, 32)
+    val = random.randint(16, 2**size)
     sig1.bits = BitArray('0x%x' % val)
     sig1.show()
     t1 = time.time()
@@ -88,20 +88,20 @@ def testCodecBP():
 
 def testAutoDecode():
     sig1 = SignalPWM(0.75)
-    sig2 = SignalAuto()
+    sig2 = Signal()
     b1 = testCodec(sig1, sig2)
     sig1 = SignalBP(39)
     b2 = testCodec(sig1, sig2)
     return b1 and b2
 
 def testAutoInit():
-    for key in ASK_DATA:
-        cfg = ASK_DATA[key]
-        sig = SignalAuto(cfg)
+    for key in ASK_CMD:
+        cfg = ASK_CMD[key]
+        sig = Signal(cfg)
         print key, 
         sig.show()
         wave = sig.encode()
-        sig2 = SignalAuto()
+        sig2 = Signal()
         if not sig2.decode(wave):
             print "testAutoInit: failed to decode"
             return False
@@ -138,8 +138,8 @@ def testStoreWave():
 
 def testStoreSignal(sig1, sig2):
     tmpfile='/tmp/signal.dat'
-    size = random.randint(1, 32)
-    val = random.randint(1, 2**size)
+    size = random.randint(5, 32)
+    val = random.randint(16, 2**size)
     sig1.bits = BitArray('0x%x' % val)
     testDump(tmpfile, sig1)
     testLoad(tmpfile, sig2)
@@ -169,7 +169,7 @@ def testLoadFiles():
             break
         #print i
         #print filename
-        sig = SignalAuto()
+        sig = Signal()
         with open (filename, 'rb') as fp:
             sig.load(fp)
         print "%3d:" % i,

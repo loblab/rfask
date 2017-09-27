@@ -98,10 +98,12 @@ class Receiver:
                 if now - self.edge_time > min_gap:
                     if b == 0:
                         ts.append(now)
-                    return wave
+                    return wave if len(ts) > 5 else None
             else:
-                ts.append(now)
+                if now - self.edge_time < self.sample_period:
+                    return None
                 self.edge_time = now
                 self.bit = b
+                ts.append(now)
         return wave
 
