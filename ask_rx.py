@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from ask_prog import *
+import copy
 
 class Program(ProgramBase):
 
@@ -26,8 +27,10 @@ class Program(ProgramBase):
             help="log received signals to text log file (LOG_FILE in ask_config.py)")
         self.argps.add_argument('-a', dest='action', action='store_true',
             help="Take actions on specified signals (ASK_ACTION in ask_config.py)")
+        self.argps.add_argument('-u', dest='unique', action='store_true',
+            help="Ingore duplicated signals in 0.5 second")
         self.argps.add_argument('-m', dest='monitor', action='store_true',
-            help="Monitor mode, log signals & take actions, same as -l -a -t %d" % sys.maxint)
+            help="Monitor mode, log signals & take actions, same as -l -a -u -t %d" % 864000)
         self.argps.add_argument('-d', dest='debug', type=int, default=0, choices=range(4),
             help="debug info level, greater for more. default 0")
         self.argps.add_argument('-p', dest='period', type=float, default=SAMPLE_PERIOD,
@@ -40,7 +43,10 @@ class Program(ProgramBase):
         if self.args.monitor:
             self.args.log = True
             self.args.action = True
-            self.args.timeout = sys.maxint
+            self.args.unique = True
+            self.args.timeout = 864000
+        prev_sig = None
+        prev_ts = 0
         total = 0
         findex = self.next_file_index()
         print "Receive signals for %d seconds... (Ctrl+C to quit)" % self.args.timeout
@@ -55,8 +61,17 @@ class Program(ProgramBase):
                     print time.strftime('%H:%M:%S <=', time.localtime(time.time())),
                     wave.show()
                 if sig.decode(wave):
+                    ts = time.time()
+                    print time.strftime('%H:%M:%S <=', time.localtime(ts)),
+                    if self.args.unique:
+                        if ts - prev_ts < 0.5 and sig == prev_sig:
+                            prev_ts = ts
+                            print "duplicated, ignored"
+                            continue
+                        else:
+                            prev_ts = ts
+                            prev_sig = copy.copy(sig)
                     total += 1
-                    print time.strftime('%H:%M:%S <=', time.localtime(time.time())),
                     if self.args.save:
                         filename = DATA_FILE % findex
                         print "FILE %d: " % findex,

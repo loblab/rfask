@@ -58,7 +58,7 @@ class Receiver:
         self.min_gap = min_gap
         self.max_gap = max_gap
 
-    def getSample(self):
+    def get_sample(self):
         self.sample_time += self.sample_period
         now = time.time()
         wait = self.sample_time - now
@@ -93,7 +93,7 @@ class Receiver:
         ts.append(now)
         min_gap = 1e-3 * self.min_gap
         while True:
-            (b, now) = self.getSample()
+            (b, now) = self.get_sample()
             if b == self.bit:
                 if now - self.edge_time > min_gap:
                     if b == 0:

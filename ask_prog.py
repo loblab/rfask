@@ -23,7 +23,7 @@ from ask_signal import *
 from ask_device import *
 from ask_config import *
 
-VERSION = "Ver 0.6, 9/27/2017, loblab"
+VERSION = "Ver 0.6, 9/28/2017, loblab"
 
 class ProgramBase:
 
