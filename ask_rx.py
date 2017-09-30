@@ -37,7 +37,7 @@ class Program(ProgramBase):
             help="sample period in ms. default %.2f" % SAMPLE_PERIOD)
 
     def init_device(self):
-        self.rx = Receiver(PIN_ASK_RX, PIN_ASK_EN, self.args.period)
+        self.rx = Receiver(PIN_ASK_RX, PIN_ASK_EN, MAX_WAVE_LEN, self.args.period)
 
     def process(self):
         if self.args.monitor:
@@ -49,7 +49,10 @@ class Program(ProgramBase):
         prev_ts = 0
         total = 0
         findex = self.next_file_index()
-        print "Receive signals for %d seconds... (Ctrl+C to quit)" % self.args.timeout
+        msg = "Receive signals for %d seconds... (Ctrl+C to quit)" % self.args.timeout
+        print msg
+        if self.args.log:
+            self.log_msg(msg)
         start_time = time.time()
         sig = Signal()
         while (time.time() - start_time < self.args.timeout): 
@@ -90,10 +93,13 @@ class Program(ProgramBase):
                         self.log_msg(msg)
                     if self.args.action:
                         self.run_action(cmd)
-        print "%d signals received." % total
+        msg = "%d signals received." % total
+        print msg
+        if self.args.log:
+            self.log_msg(msg)
         return 0
 
 if __name__ == "__main__":
-    prog = Program("Receive & decode ASK/OOK signals, save to files, take actions on specified signals")
+    prog = Program("R<X", "Receive & decode ASK/OOK signals, save to files, take actions on specified signals")
     sys.exit(prog.main())
 

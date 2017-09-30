@@ -47,13 +47,14 @@ class Transmitter:
 
 class Receiver:
 
-    def __init__(self, pin_rx, pin_en, sample_period=0.05, min_gap=3, max_gap=10):
-        GPIO.setup(pin_en, GPIO.OUT) 
+    def __init__(self, pin_rx, pin_en, max_len=2048, sample_period=0.05, min_gap=3, max_gap=10):
         # Don't enable GPIO.PUD_DOWN nor GPIO.PUD_UP due to the small receiver current
         GPIO.setup(pin_rx, GPIO.IN)
-        GPIO.output(pin_en, GPIO.HIGH)
+        if pin_en > 0:
+            GPIO.setup(pin_en, GPIO.OUT)
+            GPIO.output(pin_en, GPIO.HIGH)
         self.pin_rx = pin_rx
-        self.pin_en = pin_en
+        self.max_len = max_len
         self.sample_period = 1e-3 * sample_period
         self.min_gap = min_gap
         self.max_gap = max_gap
@@ -105,5 +106,7 @@ class Receiver:
                 self.edge_time = now
                 self.bit = b
                 ts.append(now)
+                if len(ts) > self.max_len:
+                    return None
         return wave
 

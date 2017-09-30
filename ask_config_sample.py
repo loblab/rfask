@@ -22,6 +22,7 @@ PIN_ASK_EN = 15
 PIN_ASK_RX = 18
 
 SAMPLE_PERIOD = 0.05
+MAX_WAVE_LEN = 2048
 
 # Make sure the folders existed, and writable
 LOG_FILE = '/var/loblab/rfask.log'

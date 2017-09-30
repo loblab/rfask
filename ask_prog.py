@@ -23,11 +23,12 @@ from ask_signal import *
 from ask_device import *
 from ask_config import *
 
-VERSION = "Ver 0.6, 9/28/2017, loblab"
+VERSION = "Ver 0.6, 9/30/2017, loblab"
 
 class ProgramBase:
 
-    def __init__(self, description):
+    def __init__(self, name, description):
+        self.name = name
         self.commands = {}
         self.quit_flag = False
         signal.signal(signal.SIGINT, self.sig_handler)
@@ -44,14 +45,17 @@ class ProgramBase:
     def cleanup(self):
         GPIO.cleanup()
 
-    def sig_handler(self, signum, frame):
-        print "Got system signal %d... quit now." % signum
-        self.quit_flag = True
-
     def log_msg(self, msg):
+        tstr = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(time.time()))
         with open(LOG_FILE, 'a') as fp:
-            fp.write(time.strftime('%Y/%m/%d %H:%M:%S - ', time.localtime(time.time())))
-            fp.write("%s\r\n" % msg)
+            fp.write("%s [%s] - %s\r\n" % (tstr, self.name, msg))
+
+    def sig_handler(self, signum, frame):
+        msg = "Got system signal %d... quit now." % signum
+        print msg
+        if self.args.log:
+            self.log_msg(msg)
+        self.quit_flag = True
 
     def load_commands(self):
         for key in ASK_CMD:

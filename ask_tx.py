@@ -27,6 +27,8 @@ class Program(ProgramBase):
             help="list available commands (in ask_config.py)")
         self.argps.add_argument('-f', dest='lsfile', action='store_true',
             help="list available files (recorded by ask_rx.py)")
+        self.argps.add_argument('-l', dest='log', action='store_true',
+            help="log messages to text log file (LOG_FILE in ask_config.py)")
         self.argps.add_argument('-d', dest='debug', type=int, default=0, choices=range(3),
             help="debug info level, greater for more. default 0")
 
@@ -39,8 +41,10 @@ class Program(ProgramBase):
             print "Warning: unknown command '%s'" % cmd
             return False
         wave = sig.encode()
-        print "CMD %9s:" % cmd,
-        sig.show()
+        msg = "CMD %9s: %s" % (cmd, sig)
+        print msg
+        if self.args.log:
+            self.log_msg(msg)
         if self.args.debug >= 1:
             wave.show()
         for i in range(self.args.repeat):
@@ -58,8 +62,10 @@ class Program(ProgramBase):
         with open (filename, 'rb') as fp:
             sig.load(fp)
         wave = sig.encode()
-        print "FILE %d: " % index,
-        sig.show()
+        msg = "FILE %d: %s" % (index, sig),
+        print msg
+        if self.args.log:
+            self.log_msg(msg)
         if self.args.debug >= 1:
             wave.show()
         for i in range(self.args.repeat):
@@ -110,6 +116,6 @@ class Program(ProgramBase):
         return 0
 
 if __name__ == "__main__":
-    prog = Program("Transmit ASK/OOK commands in ask_config.py or in saved files")
+    prog = Program("T>X", "Transmit ASK/OOK commands in ask_config.py or in saved files")
     sys.exit(prog.main())
 

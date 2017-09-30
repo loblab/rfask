@@ -5,7 +5,7 @@
 - Features: supports PWM, Biphase(Manchester) code; dump to/load from files; compare signals, trigger actions
 - Platform: Linux (Raspberry Pi)
 - Ver: 0.6
-- Updated: 9/28/2017
+- Updated: 9/30/2017
 - Created: 8/7/2017
 - Author: loblab
 
