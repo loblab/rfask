@@ -48,8 +48,8 @@ def testBitWave():
 
 def testCodec(sig1, sig2, dither=0.0):
     global DITHER
-    size = random.randint(5, 32)
-    val = random.randint(16, 2**size)
+    size = random.randint(13, 32)
+    val = random.randint(257, 2**size)
     sig1.bits = BitArray('0x%x' % val)
     sig1.show()
     t1 = time.time()
@@ -138,8 +138,8 @@ def testStoreWave():
 
 def testStoreSignal(sig1, sig2):
     tmpfile='/tmp/signal.dat'
-    size = random.randint(5, 32)
-    val = random.randint(16, 2**size)
+    size = random.randint(13, 32)
+    val = random.randint(257, 2**size)
     sig1.bits = BitArray('0x%x' % val)
     testDump(tmpfile, sig1)
     testLoad(tmpfile, sig2)

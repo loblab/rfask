@@ -135,7 +135,7 @@ class SignalPWM(SignalBase):
     def decode(self, wave):
         ts = wave.timestamp
         size = len(ts) - 1
-        if size < 17:  # 8 bits at least
+        if size < 25:  # 12 bits at least
             return False
         if wave.startbit == 1:
             self.start1 = ts[1] - ts[0]
@@ -151,6 +151,8 @@ class SignalPWM(SignalBase):
         csym = cbits / 2 - 1
         dur = ts[-3] - ts[i1]
         self.period = dur / csym
+        if self.period < 5e-4:
+            return False
         self.stop0 = ts[-1] - ts[-3] - self.period
         if self.stop0 < 0:
             return False
