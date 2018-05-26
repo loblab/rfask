@@ -20,7 +20,7 @@ from ask_wave import *
 class SignalBase:
 
     def show(self):
-        print self.__str__()
+        print(self.__str__())
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -238,7 +238,7 @@ class SignalBP(SignalBase):
 
     def detect_head(self, ts):
         if len(ts) < 20:
-            #print "SignalBP.detect_head: too short %d" % len(ts)
+            #print("SignalBP.detect_head: too short %d" % len(ts))
             return 0
         self.start0 = ts[1] - ts[0]
         count = 0
@@ -252,7 +252,7 @@ class SignalBP(SignalBase):
             if wmin > w:
                 wmin = w
                 if wmin < 1e-4:
-                    #print "SignalBP.detect_head: too small wmin %f" % wmin
+                    #print("SignalBP.detect_head: too small wmin %f" % wmin)
                     return 0
             if wmax < w:
                 if count > 8:
@@ -267,20 +267,20 @@ class SignalBP(SignalBase):
                             self.period = wavg
                             return i + 1
                         else:
-                            #print "SignalBP.detect_head: invalid width %d (%.2f at %d), (should be 2)" % (wn, w * 1e3, i)
+                            #print("SignalBP.detect_head: invalid width %d (%.2f at %d), (should be 2)" % (wn, w * 1e3, i))
                             return 0
                 wmax = w
             count += 1
             wsum += w
             b = 1 - b
-        #print "SignalBP.detect_head: didn't find head"
+        #print("SignalBP.detect_head: didn't find head")
         return 0
 
     def decode(self, wave):
         ts = wave.timestamp if wave.startbit == 0 else wave.timestamp[1:]
         start = self.detect_head(ts)
         if start <= 0:
-            #print "SignalBP.decode: cannot find head"
+            #print("SignalBP.decode: cannot find head")
             return False
         ws = []
         b = wave.startbit
@@ -292,7 +292,7 @@ class SignalBP(SignalBase):
             w = ts[i + 1] - ts[i]
             c = int(w / hp + 0.5)
             if c < 1 or c > 2:
-                #print "SignalBP.decode: invalid width %d (%.2fms at %d), should be 1 or 2" % (c, w * 1e3, i)
+                #print("SignalBP.decode: invalid width %d (%.2fms at %d), should be 1 or 2" % (c, w * 1e3, i))
                 return False
             ws.append(c)
             if c == 2:
@@ -302,7 +302,7 @@ class SignalBP(SignalBase):
                 w = ts[i + 1] - ts[i]
                 c = int(w / hp + 0.5)
                 if c != 1:
-                    #print "SignalBP.decode: invalid width %d (%.2fms at %d), should be 1" % (c, w * 1e3, i)
+                    #print("SignalBP.decode: invalid width %d (%.2fms at %d), should be 1" % (c, w * 1e3, i))
                     return False
                 ws.append(c)
                 self.bits.append('0b0')

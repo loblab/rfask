@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # Copyright 2017 loblab
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #       http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +15,8 @@
 
 # Self test scripts
 
-import time 
+from __future__ import print_function
+import time
 import sys
 import random
 import os.path
@@ -55,13 +56,13 @@ def testCodec(sig1, sig2, dither=0.0):
     t1 = time.time()
     wave = sig1.encode()
     t2 = time.time()
-    print "Encode time: %.2fms" % ((t2 - t1) * 1000)
+    print("Encode time: %.2fms" % ((t2 - t1) * 1000))
     wave.dither(sig1.period * DITHER)
     wave.show()
     t1 = time.time()
     if sig2.decode(wave):
         t2 = time.time()
-        print "Decode time: %.2fms" % ((t2 - t1) * 1000)
+        print("Decode time: %.2fms" % ((t2 - t1) * 1000))
         sig2.show()
         return sig2 == sig1
     return False
@@ -98,16 +99,16 @@ def testAutoInit():
     for key in ASK_CMD:
         cfg = ASK_CMD[key]
         sig = Signal(cfg)
-        print key, 
+        print(key, end=' ')
         sig.show()
         wave = sig.encode()
         sig2 = Signal()
         if not sig2.decode(wave):
-            print "testAutoInit: failed to decode"
+            print("testAutoInit: failed to decode")
             return False
         sig2.show()
         if sig2 != sig:
-            print "testAutoInit: error in compare"
+            print("testAutoInit: error in compare")
             return False
     return True
 
@@ -117,14 +118,14 @@ def testDump(filename, obj):
     with open (filename, 'wb') as fp:
         obj.dump(fp)
     t2 = time.time()
-    print "Dump time: %.2fms" % ((t2 - t1) * 1000)
+    print("Dump time: %.2fms" % ((t2 - t1) * 1000))
 
 def testLoad(filename, obj):
     t1 = time.time()
     with open (filename, 'rb') as fp:
       obj.load(fp)
     t2 = time.time()
-    print "Load time: %.2fms" % ((t2 - t1) * 1000)
+    print("Load time: %.2fms" % ((t2 - t1) * 1000))
     obj.show()
 
 def testStoreWave():
@@ -167,12 +168,12 @@ def testLoadFiles():
         filename = DATA_FILE % i
         if not os.path.isfile(filename):
             break
-        #print i
-        #print filename
+        #print(i)
+        #print(filename)
         sig = Signal()
         with open (filename, 'rb') as fp:
             sig.load(fp)
-        print "%3d:" % i,
+        print("%3d:" % i, end=' ')
         sig.show()
     return True
 
@@ -196,20 +197,20 @@ TEST_CASES = [
 
 def list_cases():
     for i in range(len(TEST_CASES)):
-        print "%2d: %s" % (i + 1, TEST_CASES[i][1])
+        print("%2d: %s" % (i + 1, TEST_CASES[i][1]))
 
 def run_case(index):
     case = TEST_CASES[index - 1]
     print
-    print "Case %d: %s" % (index, case[1])
-    print '========================================='
+    print("Case %d: %s" % (index, case[1]))
+    print('=========================================')
     t1 = time.time()
     rc = case[0]()
     t2 = time.time()
-    print '----------------------'
-    print "%s. %.2f ms" % ('PASS' if rc else 'FAIL', (t2 - t1) * 1000)
+    print('----------------------')
+    print("%s. %.2f ms" % ('PASS' if rc else 'FAIL', (t2 - t1) * 1000))
     return rc
-     
+
 def run_cases(cases):
     passed = 0
     failed = 0
@@ -224,8 +225,8 @@ def run_cases(cases):
     total = passed + failed
     if total > 1:
         print
-        print '#########################################'
-        print "%d/%d FAIL. %.2f ms" % (failed, total, (t2 - t1) * 1000)
+        print('#########################################')
+        print("%d/%d FAIL. %.2f ms" % (failed, total, (t2 - t1) * 1000))
 
 
 def main(argv=None):

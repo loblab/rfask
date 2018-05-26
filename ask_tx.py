@@ -1,18 +1,19 @@
 #!/usr/bin/python
 # Copyright 2017 loblab
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #       http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import re
 from ask_prog import *
 
@@ -38,39 +39,39 @@ class Program(ProgramBase):
     def play_command(self, cmd):
         sig = self.commands.get(cmd)
         if sig is None:
-            print "Warning: unknown command '%s'" % cmd
+            print("Warning: unknown command '%s'" % cmd)
             return False
         wave = sig.encode()
         msg = "CMD %9s: %s" % (cmd, sig)
-        print msg
+        print(msg)
         if self.args.log:
             self.log_msg(msg)
         if self.args.debug >= 1:
             wave.show()
         for i in range(self.args.repeat):
             if self.args.debug >= 2:
-                print i + 1
+                print(i + 1)
             self.tx.send(wave)
         return True
 
     def play_file(self, index):
         filename = DATA_FILE % index
         if not os.path.isfile(filename):
-            print "Warning: file %d does not exist" % index
+            print("Warning: file %d does not exist" % index)
             return False
         sig = Signal()
         with open (filename, 'rb') as fp:
             sig.load(fp)
         wave = sig.encode()
         msg = "FILE %d: %s" % (index, sig),
-        print msg
+        print(msg)
         if self.args.log:
             self.log_msg(msg)
         if self.args.debug >= 1:
             wave.show()
         for i in range(self.args.repeat):
             if self.args.debug >= 2:
-                print i + 1
+                print(i + 1)
             tx.send(wave)
         return True
 
@@ -79,18 +80,18 @@ class Program(ProgramBase):
         for cmd in self.args.commands:
             if self.quit_flag:
                 break
-            print time.strftime('%H:%M:%S =>', time.localtime(time.time())),
+            print(time.strftime('%H:%M:%S =>', time.localtime(time.time())), end=' ')
             if cmd == 'lock':
-                print "Lock"
+                print("Lock")
                 self.tx.lock()
             elif cmd == 'unlock':
-                print "Unlock"
+                print("Unlock")
                 self.tx.unlock()
             else:
                 m =  re_wait.match(cmd)
                 if (m):
                     wait = float(m.groups()[0])
-                    print "Wait %.1fs" % wait
+                    print("Wait %.1fs" % wait)
                     time.sleep(wait)
                 elif cmd.isdigit():
                     if not self.play_file(int(cmd)):
